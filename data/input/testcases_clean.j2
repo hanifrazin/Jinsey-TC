@@ -4,6 +4,7 @@
    ============================================================ #}
 {% import "shared/login_steps.j2" as login %}
 {% import "shared/preconditions.j2" as pre %}
+{% import "shared/dropdowns.j2" as dropdowns %}
 {% set ns = namespace(cases=[], login_examples=[]) %}
 
 
@@ -26,10 +27,13 @@
         Halaman utama ditampilkan
     {% endset %}
 
+    {# Dropdown Kategori: nilai awal A, pilihan di Excel A/B/C.
+       Definisi di shared/dropdowns.j2 dipakai ulang oleh block lain. #}
     {% set _ = ns.login_examples.append({
         "key": "login-success",
         "prefix": "LOGIN",
         "title": "Login dengan kredensial valid",
+        "dropdown": {"Kategori": dropdowns.kategori},
         "action": success_action,
         "expected": success_expected,
         "priority": "P0",
@@ -55,6 +59,7 @@
         "key": "login-wrong-password",
         "prefix": "LOGIN",
         "title": "Login dengan password salah",
+        "dropdown": {"Kategori": dict(dropdowns.kategori, value="B")},
         "action": wrong_action,
         "expected": wrong_expected,
         "priority": "P1",
@@ -75,6 +80,7 @@
         "key": "login-empty-email",
         "prefix": "LOGIN",
         "title": "Login tanpa email",
+        "dropdown": {"Kategori": dict(dropdowns.kategori, value="C")},
         "action": empty_email_action,
         "expected": "Pesan email wajib diisi ditampilkan",
         "priority": "P1",
@@ -161,6 +167,9 @@
     } %}
     {% if "prefix" in example %}
         {% set _ = case.update({"prefix": example.prefix}) %}
+    {% endif %}
+    {% if "dropdown" in example %}
+        {% set _ = case.update({"dropdown": example.dropdown}) %}
     {% endif %}
     {% set _ = ns.cases.append(case) %}
 {% endfor %}

@@ -313,7 +313,7 @@ Klik tombol Login
 
 Wajib: `key`, `feature`, `scenario`, `steps`, `expected` (string tidak kosong).
 Opsional: `precondition`, `priority`, `tags` (list string), `test_data` (data JSON),
-`test_type`, `prefix`. `id` hanya dibuat processor; penulisan ID dalam template ditolak.
+`test_type`, `prefix`, `dropdown`. `id` hanya dibuat processor; penulisan ID dalam template ditolak.
 Expected result independen dari jumlah langkah. Baris kosong dibuang, whitespace
 di tepi setiap baris dibersihkan, urutan dan pemisah baris isi tetap dipertahankan.
 Judul atau urutan boleh berubah; pertahankan `key` untuk identitas yang sama.
@@ -357,6 +357,68 @@ baris per kasus. Opsi panjang atau yang mengandung koma memakai hidden lookup sh
 dan named range. Respons dropdown bergantung aplikasi Excel yang digunakan.
 Teks authored selalu disimpan sebagai teks, termasuk yang diawali `=`.
 Sel melebihi batas Excel 32.767 karakter ditolak agar tidak terpotong diam-diam.
+
+### Dropdown bebas tanpa konfigurasi terpisah
+
+Tambahkan keyword `dropdown` pada objek test case, langsung di `.j2`:
+
+```jinja2
+"dropdown": {"Kategori": "A", "Status Review": "Belum diperiksa"}
+```
+
+Nama kolom bebas. Jika kasus lain memakai `"Kategori": "B"` dan
+`"Kategori": "C"`, Excel otomatis membuat kolom **Kategori** dengan pilihan
+**A, B, C** pada seluruh baris kasus. Tidak perlu mengedit `config/fields.yaml`.
+Pilihan unik dikumpulkan menurut urutan kemunculan dalam satu sheet; setiap sheet
+mempunyai daftar sendiri. Kasus tanpa field tersebut mendapat sel kosong.
+Contoh A/B/C tersedia di tiga kasus Login pertama pada `testcases_clean.j2`.
+
+Untuk menyertakan pilihan yang belum dipakai kasus lain, tulis langsung:
+
+```jinja2
+"dropdown": {
+    "Kategori": {"value": "A", "options": ["A", "B", "C"]},
+    "Lingkungan": "Staging"
+}
+```
+
+`value` harus ada dalam `options`. Daftar inline dan nilai dari kasus lain digabung
+menjadi pilihan kolom tersebut. Nama kolom harus konsisten huruf besar/kecil dan
+tidak boleh sama dengan kolom bawaan seperti `Priority` atau `Scenario`.
+Nama, nilai, dan pilihan berupa string tidak kosong tanpa spasi di tepi.
+YAML menyimpan `dropdown` beserta nilai dan opsi inline agar metadata tetap tersedia.
+Dropdown bawaan Priority tetap memakai konfigurasi yang sudah ada.
+
+### Memakai dropdown dari shared
+
+Contoh reusable tersedia di `data/input/shared/dropdowns.j2`:
+
+```jinja2
+{% set kategori = {"value": "A", "options": ["A", "B", "C"]} %}
+```
+
+Import sekali di bagian atas template:
+
+```jinja2
+{% import "shared/dropdowns.j2" as dropdowns %}
+```
+
+Lalu panggil dari objek test case pada block yang membutuhkan:
+
+```jinja2
+"dropdown": {"Kategori": dropdowns.kategori}
+```
+
+Untuk nilai awal berbeda, buat salinan dengan `dict` bawaan Jinja:
+
+```jinja2
+"dropdown": {"Kategori": dict(dropdowns.kategori, value="B")}
+```
+
+Pilihan tetap A/B/C; hanya nilai awal kasus tersebut berubah. `dict` membuat
+salinan sehingga default A pada definisi shared dan block lain tetap terjaga.
+Pola ini sudah dipakai tiga block Login pertama di `testcases_clean.j2`.
+Definisi shared bersifat opsional; bentuk inline tetap didukung.
 
 ## ID dan keamanan export
 

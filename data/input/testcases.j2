@@ -40,8 +40,16 @@
         Halaman utama ditampilkan
     {% endset %}
 
+    {# Dropdown Kategori: nilai awal A, pilihan di Excel A/B/C.
+       Pilihan ditulis langsung di kasus ini, tanpa konfigurasi terpisah. #}
     {% set _ = ns.cases.append({
         "key": "login-success",
+        "dropdown": {
+            "Kategori": {
+                "value": "A",
+                "options": ["A", "B", "C"]
+            }
+        },
         "prefix": "LOGIN",
         "feature": "Login",
         "scenario": "Login dengan kredensial valid",
@@ -87,6 +95,7 @@
 
     {% set _ = ns.cases.append({
         "key": "login-wrong-password",
+        "dropdown": {"Kategori": {"value": "B", "options": ["A", "B", "C"]}},
         "prefix": "LOGIN",
         "feature": "Login",
         "scenario": "Login dengan password salah",
@@ -131,6 +140,7 @@
 
     {% set _ = ns.cases.append({
         "key": "login-empty-email",
+        "dropdown": {"Kategori": {"value": "C", "options": ["A", "B", "C"]}},
         "prefix": "LOGIN",
         "feature": "Login",
         "scenario": "Login tanpa email",

@@ -3,6 +3,7 @@ import json
 import re
 from typing import Any
 
+from jinsey.columns import COLS, INVALID_XML_TEXT
 from jinsey.errors import JinseyError
 from jinsey.schema import ChoiceField, TestCase
 
@@ -26,8 +27,9 @@ def normalize(envelope: dict, fields: dict[str, ChoiceField], prefix_override: s
         raise JinseyError("test_cases must be a nonempty list")
     seen: set[str] = set()
     cases = []
+    dropdown_names: dict[str, str] = {}
     required = {"key", "feature", "scenario", "steps", "expected"}
-    allowed = required | {"precondition", "priority", "tags", "test_data", "test_type", "prefix"}
+    allowed = required | {"precondition", "priority", "tags", "test_data", "test_type", "prefix", "dropdown"}
     for index, raw in enumerate(raw_cases, 1):
         label = f"Test case #{index}"
         if not isinstance(raw, dict):
@@ -66,6 +68,11 @@ def normalize(envelope: dict, fields: dict[str, ChoiceField], prefix_override: s
             json.dumps(test_data, allow_nan=False)
         except (ValueError, TypeError, RecursionError) as exc:
             raise JinseyError(f"{label}: test_data must be valid JSON data") from exc
+        dropdown = validate_dropdown(raw.get("dropdown", {}), label)
+        for name in dropdown:
+            previous = dropdown_names.setdefault(name.casefold(), name)
+            if previous != name:
+                raise JinseyError(f"{label}: dropdown column spelling must match {previous!r}, got {name!r}")
         steps = normalize_text(raw["steps"])
         cases.append(TestCase(
             key=key, feature=normalize_text(raw["feature"]), scenario=normalize_text(raw["scenario"]),
@@ -73,6 +80,37 @@ def normalize(envelope: dict, fields: dict[str, ChoiceField], prefix_override: s
             expected=normalize_text(raw["expected"]), precondition=normalize_text(raw.get("precondition", "")),
             priority=priority, tags=tuple(tag.strip() for tag in tags), test_data=test_data,
             test_type=normalize_text(raw.get("test_type", "")),
-            prefix=case_prefix,
+            prefix=case_prefix, dropdown=dropdown,
         ))
     return prefix, cases
+
+
+def validate_dropdown(raw: Any, label: str) -> dict[str, Any]:
+    if not isinstance(raw, dict):
+        raise JinseyError(f"{label}: dropdown must map column names to values")
+    reserved = {header.casefold() for _, header, _ in COLS}
+    seen = set()
+
+    def valid_text(value: Any) -> bool:
+        return (isinstance(value, str) and bool(value.strip()) and value == value.strip()
+                and len(value) <= 32767 and not INVALID_XML_TEXT.search(value))
+
+    for name, spec in raw.items():
+        if (not valid_text(name) or not name.isprintable() or name.casefold() in reserved
+                or name.casefold() in seen):
+            raise JinseyError(f"{label}: invalid or duplicate dropdown column {name!r}")
+        seen.add(name.casefold())
+        if isinstance(spec, str):
+            if not valid_text(spec):
+                raise JinseyError(f"{label}: dropdown {name}: value must be a nonempty Excel-compatible string")
+        elif isinstance(spec, dict) and set(spec) == {"value", "options"}:
+            options = spec["options"]
+            if (not isinstance(options, list) or not options
+                    or any(not valid_text(option) for option in options)
+                    or len(set(options)) != len(options)):
+                raise JinseyError(f"{label}: dropdown {name}: options must be unique nonempty Excel-compatible strings")
+            if not isinstance(spec["value"], str) or spec["value"] not in options:
+                raise JinseyError(f"{label}: dropdown {name}: value must be one of options")
+        else:
+            raise JinseyError(f"{label}: dropdown {name}: use a string or an object with value and options")
+    return raw

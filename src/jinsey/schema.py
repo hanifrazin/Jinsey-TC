@@ -1,6 +1,6 @@
 """Shared choice configuration and normalized test case contract."""
 import re
-from dataclasses import asdict, dataclass, replace
+from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
@@ -56,12 +56,16 @@ class TestCase:
     id: str = ""
     prefix: str = "TC"
 
+    dropdown: dict[str, Any] = field(default_factory=dict)
+
     def with_id(self, display_id: str) -> "TestCase":
         return replace(self, id=display_id)
 
     def to_dict(self) -> dict[str, Any]:
         data = asdict(self)
         data["tags"] = list(self.tags)
+        if not self.dropdown:
+            del data["dropdown"]
         return data
 
 

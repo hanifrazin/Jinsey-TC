@@ -27,6 +27,7 @@
 
     {% set _ = ns.cases.append({
         "key": "login-wrong-password",
+        "dropdown": {"Kategori": {"value": "B", "options": ["A", "B", "C"]}},
         "prefix": "LOGIN",
         "feature": "Login",
         "scenario": "Login dengan password salah",
@@ -70,6 +71,7 @@
 
     {% set _ = ns.cases.append({
         "key": "login-empty-email",
+        "dropdown": {"Kategori": {"value": "C", "options": ["A", "B", "C"]}},
         "prefix": "LOGIN",
         "feature": "Login",
         "scenario": "Login tanpa email",
