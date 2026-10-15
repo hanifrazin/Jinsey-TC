@@ -1,0 +1,27 @@
+# Python environment and generated caches
+.venv/
+__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Generated artifacts (current and previous layout)
+/data/output/
+/output/
+
+# Local persistent ID state and process locks
+.id_registry.json
+.id_registry.json.lock
+.jinsey.lock
+
+# macOS metadata
+.DS_Store
+
+# Local coding-agent settings
+/.codex/
+
+# Local environment secrets
+.env
+.env.*
+!.env.example

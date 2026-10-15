@@ -1,0 +1,446 @@
+{# ============================================================
+   VERSI LENGKAP — SATU BLOK BERISI SATU TEST CASE
+
+   Semua precondition, steps, expected, dan data ditulis di sini.
+   Tidak perlu membuka shared/ atau membaca loop untuk memahami TC.
+   Setiap TC dibatasi block/endblock bernama sesuai key (strip menjadi underscore).
+   key adalah identitas tetap; pertahankan saat mengedit kasus.
+   ID pada komentar adalah contoh; ID aktual mengikuti registry setiap prefix.
+   ID aktual tetap diberikan generator; --prefix dapat mengubahnya.
+   priority: P0 / P1 / P2. tags: [] jika tidak ada.
+   test_data: none jika tidak ada. Teks kosong berarti tidak diisi.
+
+   Versi reusable tersedia di testcases_clean.j2.
+   ============================================================ #}
+{% set ns = namespace(cases=[]) %}
+
+
+
+{% block login_success %}
+    {# ============================================================
+       ID referensi (prefix LOGIN): LOGIN-001
+       Key: login-success
+       LOGIN — Login dengan kredensial valid
+       ============================================================ #}
+    {% set precondition %}
+        Akun fiktif pengguna@example.test sudah terdaftar dan aktif
+        Pengguna belum memiliki sesi aktif
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Login aplikasi fiktif Lentera
+        Pastikan formulir Login ditampilkan
+        Masukkan email pengguna@example.test
+        Masukkan password fiktif Valid!234
+        Klik tombol Login
+    {% endset %}
+
+    {% set expected %}
+        Pengguna berhasil masuk
+        Halaman utama ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "login-success",
+        "prefix": "LOGIN",
+        "feature": "Login",
+        "scenario": "Login dengan kredensial valid",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P0",
+        "tags": [
+            "fictional",
+            "positive"
+        ],
+        "test_data": {
+            "email": "pengguna@example.test"
+        },
+        "test_type": "positive"
+    }) %}
+{% endblock login_success %}
+
+
+{% block login_wrong_password %}
+    {# ============================================================
+       ID referensi (prefix LOGIN): LOGIN-002
+       Key: login-wrong-password
+       LOGIN — Login dengan password salah
+       ============================================================ #}
+    {% set precondition %}
+        Akun fiktif pengguna@example.test sudah terdaftar dan aktif
+        Pengguna belum memiliki sesi aktif
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Login aplikasi fiktif Lentera
+        Pastikan formulir Login ditampilkan
+        Masukkan email pengguna@example.test
+        Masukkan password fiktif Salah!234
+        Klik tombol Login
+    {% endset %}
+
+    {% set expected %}
+        Pesan kredensial tidak valid ditampilkan
+        Pengguna tetap berada di halaman Login
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "login-wrong-password",
+        "prefix": "LOGIN",
+        "feature": "Login",
+        "scenario": "Login dengan password salah",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P1",
+        "tags": [
+            "fictional",
+            "negative"
+        ],
+        "test_data": {
+            "email": "pengguna@example.test"
+        },
+        "test_type": "negative"
+    }) %}
+{% endblock login_wrong_password %}
+
+
+{% block login_empty_email %}
+    {# ============================================================
+       ID referensi (prefix LOGIN): LOGIN-003
+       Key: login-empty-email
+       LOGIN — Login tanpa email
+       ============================================================ #}
+    {% set precondition %}
+        Akun fiktif pengguna@example.test sudah terdaftar dan aktif
+        Pengguna belum memiliki sesi aktif
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Login aplikasi fiktif Lentera
+        Pastikan formulir Login ditampilkan
+        Kosongkan email
+        Isi password fiktif Valid!234
+        Klik tombol Login
+    {% endset %}
+
+    {% set expected %}
+        Pesan email wajib diisi ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "login-empty-email",
+        "prefix": "LOGIN",
+        "feature": "Login",
+        "scenario": "Login tanpa email",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P1",
+        "tags": [
+            "fictional",
+            "negative"
+        ],
+        "test_data": {
+            "email": "pengguna@example.test"
+        },
+        "test_type": "negative"
+    }) %}
+{% endblock login_empty_email %}
+
+
+{% block login_empty_fields %}
+    {# ============================================================
+       ID referensi (prefix LOGIN): LOGIN-004
+       Key: login-empty-fields
+       LOGIN — Login tanpa mengisi formulir
+       ============================================================ #}
+    {% set precondition %}
+        Akun fiktif pengguna@example.test sudah terdaftar dan aktif
+        Pengguna belum memiliki sesi aktif
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Login aplikasi fiktif Lentera
+        Pastikan formulir Login ditampilkan
+        Biarkan email dan password kosong
+        Klik tombol Login
+    {% endset %}
+
+    {% set expected %}
+        Pesan email wajib diisi ditampilkan
+        Pesan password wajib diisi ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "login-empty-fields",
+        "prefix": "LOGIN",
+        "feature": "Login",
+        "scenario": "Login tanpa mengisi formulir",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P2",
+        "tags": [
+            "fictional",
+            "negative"
+        ],
+        "test_data": {
+            "email": "pengguna@example.test"
+        },
+        "test_type": "negative"
+    }) %}
+{% endblock login_empty_fields %}
+
+
+{% block login_password_visibility %}
+    {# ============================================================
+       ID referensi (prefix LOGIN): LOGIN-005
+       Key: login-password-visibility
+       LOGIN — Tampilkan dan sembunyikan password
+       ============================================================ #}
+    {% set precondition %}
+        Akun fiktif pengguna@example.test sudah terdaftar dan aktif
+        Pengguna belum memiliki sesi aktif
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Login aplikasi fiktif Lentera
+        Pastikan formulir Login ditampilkan
+        Masukkan password fiktif Valid!234
+        Klik ikon tampilkan password
+        Amati teks password
+        Klik ikon sembunyikan password
+    {% endset %}
+
+    {% set expected %}
+        Password terlihat setelah ikon tampilkan diklik
+        Password tersamarkan kembali setelah ikon sembunyikan diklik
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "login-password-visibility",
+        "prefix": "LOGIN",
+        "feature": "Login",
+        "scenario": "Tampilkan dan sembunyikan password",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P2",
+        "tags": [
+            "fictional",
+            "functional"
+        ],
+        "test_data": {
+            "email": "pengguna@example.test"
+        },
+        "test_type": "functional"
+    }) %}
+{% endblock login_password_visibility %}
+
+
+{% block register_success %}
+    {# ============================================================
+       ID referensi (prefix REGISTER): REGISTER-001
+       Key: register-success
+       REGISTER — Register akun baru
+       ============================================================ #}
+    {% set precondition %}
+        Email baru@example.test belum terdaftar
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Register
+        Isi nama tampilan Pengguna Fiktif
+        Isi email baru baru@example.test
+        Isi password fiktif Baru!234 dan konfirmasi yang sama
+        Setujui ketentuan aplikasi fiktif
+        Klik tombol Register
+    {% endset %}
+
+    {% set expected %}
+        Akun baru berhasil dibuat
+        Pesan pendaftaran berhasil ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "register-success",
+        "prefix": "REGISTER",
+        "feature": "Register",
+        "scenario": "Register akun baru",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P1",
+        "tags": [
+            "fictional",
+            "positive"
+        ],
+        "test_data": {
+            "email": "baru@example.test",
+            "name": "Pengguna Fiktif"
+        },
+        "test_type": "positive"
+    }) %}
+{% endblock register_success %}
+
+
+{% block register_invalid_email %}
+    {# ============================================================
+       ID referensi (prefix REGISTER): REGISTER-002
+       Key: register-invalid-email
+       REGISTER — Register dengan format email salah
+       ============================================================ #}
+    {% set precondition %}
+
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Register
+        Isi email dengan teks bukan-email
+        Isi field wajib lainnya dengan data fiktif valid
+        Klik tombol Register
+    {% endset %}
+
+    {% set expected %}
+        Pesan format email tidak valid ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "register-invalid-email",
+        "prefix": "REGISTER",
+        "feature": "Register",
+        "scenario": "Register dengan format email salah",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P2",
+        "tags": [],
+        "test_data": none,
+        "test_type": "negative"
+    }) %}
+{% endblock register_invalid_email %}
+
+
+{% block register_password_mismatch %}
+    {# ============================================================
+       ID referensi (prefix REGISTER): REGISTER-003
+       Key: register-password-mismatch
+       REGISTER — Register dengan konfirmasi password berbeda
+       ============================================================ #}
+    {% set precondition %}
+
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Register
+        Isi email baru lain@example.test
+        Isi password fiktif Baru!234
+        Isi konfirmasi password fiktif Berbeda!234
+        Isi field wajib lainnya
+        Klik tombol Register
+    {% endset %}
+
+    {% set expected %}
+        Pesan konfirmasi password tidak cocok ditampilkan
+        Akun tidak dibuat
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "register-password-mismatch",
+        "prefix": "REGISTER",
+        "feature": "Register",
+        "scenario": "Register dengan konfirmasi password berbeda",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P1",
+        "tags": [],
+        "test_data": none,
+        "test_type": "negative"
+    }) %}
+{% endblock register_password_mismatch %}
+
+
+{% block logout_success %}
+    {# ============================================================
+       ID referensi (prefix LOGOUT): LOGOUT-001
+       Key: logout-success
+       LOGOUT — Logout dari sesi aktif
+       ============================================================ #}
+    {% set precondition %}
+        Pengguna fiktif sudah masuk ke aplikasi Lentera
+        Halaman utama ditampilkan
+    {% endset %}
+
+    {% set steps %}
+        Buka menu akun
+        Klik tombol Logout
+    {% endset %}
+
+    {% set expected %}
+        Sesi pengguna berakhir
+        Halaman Login ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "logout-success",
+        "prefix": "LOGOUT",
+        "feature": "Logout",
+        "scenario": "Logout dari sesi aktif",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P0",
+        "tags": [
+            "smoke",
+            "fictional"
+        ],
+        "test_data": none,
+        "test_type": ""
+    }) %}
+{% endblock logout_success %}
+
+
+{% block logout_protected_page %}
+    {# ============================================================
+       ID referensi (prefix LOGOUT): LOGOUT-002
+       Key: logout-protected-page
+       LOGOUT — Akses halaman terlindungi setelah Logout
+       ============================================================ #}
+    {% set precondition %}
+        Pengguna fiktif sudah masuk ke aplikasi Lentera
+        Halaman utama ditampilkan
+    {% endset %}
+
+    {% set steps %}
+        Buka menu akun
+        Klik tombol Logout
+        Gunakan tombol kembali pada browser
+        Muat ulang halaman yang memerlukan sesi aktif
+    {% endset %}
+
+    {% set expected %}
+        Pengguna diarahkan ke halaman Login
+        Konten halaman terlindungi tidak ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "logout-protected-page",
+        "prefix": "LOGOUT",
+        "feature": "Logout",
+        "scenario": "Akses halaman terlindungi setelah Logout",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P1",
+        "tags": [],
+        "test_data": none,
+        "test_type": "negative"
+    }) %}
+{% endblock logout_protected_page %}
+
+
+{# HASIL AKHIR — Serahkan semua test case ke generator. #}
+{{ {"test_cases": ns.cases} | tojson }}

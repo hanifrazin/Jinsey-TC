@@ -1,0 +1,81 @@
+{# Contoh mode folder: file ini menjadi sheet logout. #}
+{% set ns = namespace(cases=[]) %}
+
+{% block logout_success %}
+    {# ============================================================
+       ID referensi (prefix LOGOUT): LOGOUT-001
+       Key: logout-success
+       LOGOUT — Logout dari sesi aktif
+       ============================================================ #}
+    {% set precondition %}
+        Pengguna fiktif sudah masuk ke aplikasi Lentera
+        Halaman utama ditampilkan
+    {% endset %}
+
+    {% set steps %}
+        Buka menu akun
+        Klik tombol Logout
+    {% endset %}
+
+    {% set expected %}
+        Sesi pengguna berakhir
+        Halaman Login ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "logout-success",
+        "prefix": "LOGOUT",
+        "feature": "Logout",
+        "scenario": "Logout dari sesi aktif",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P0",
+        "tags": [
+            "smoke",
+            "fictional"
+        ],
+        "test_data": none,
+        "test_type": ""
+    }) %}
+{% endblock logout_success %}
+
+{% block logout_protected_page %}
+    {# ============================================================
+       ID referensi (prefix LOGOUT): LOGOUT-002
+       Key: logout-protected-page
+       LOGOUT — Akses halaman terlindungi setelah Logout
+       ============================================================ #}
+    {% set precondition %}
+        Pengguna fiktif sudah masuk ke aplikasi Lentera
+        Halaman utama ditampilkan
+    {% endset %}
+
+    {% set steps %}
+        Buka menu akun
+        Klik tombol Logout
+        Gunakan tombol kembali pada browser
+        Muat ulang halaman yang memerlukan sesi aktif
+    {% endset %}
+
+    {% set expected %}
+        Pengguna diarahkan ke halaman Login
+        Konten halaman terlindungi tidak ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "logout-protected-page",
+        "prefix": "LOGOUT",
+        "feature": "Logout",
+        "scenario": "Akses halaman terlindungi setelah Logout",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P1",
+        "tags": [],
+        "test_data": none,
+        "test_type": "negative"
+    }) %}
+{% endblock logout_protected_page %}
+
+{{ {"test_cases": ns.cases} | tojson }}

@@ -1,0 +1,6 @@
+fields:
+  priority:
+    type: select
+    options: [P0, P1, P2]
+    default: P2
+    required: true

@@ -1,0 +1,79 @@
+{# Contoh mode folder: file ini menjadi sheet register_negative. #}
+{% set ns = namespace(cases=[]) %}
+
+{% block register_invalid_email %}
+    {# ============================================================
+       ID referensi (prefix REGISTER): REGISTER-002
+       Key: register-invalid-email
+       REGISTER — Register dengan format email salah
+       ============================================================ #}
+    {% set precondition %}
+
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Register
+        Isi email dengan teks bukan-email
+        Isi field wajib lainnya dengan data fiktif valid
+        Klik tombol Register
+    {% endset %}
+
+    {% set expected %}
+        Pesan format email tidak valid ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "register-invalid-email",
+        "prefix": "REGISTER",
+        "feature": "Register",
+        "scenario": "Register dengan format email salah",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P2",
+        "tags": [],
+        "test_data": none,
+        "test_type": "negative"
+    }) %}
+{% endblock register_invalid_email %}
+
+{% block register_password_mismatch %}
+    {# ============================================================
+       ID referensi (prefix REGISTER): REGISTER-003
+       Key: register-password-mismatch
+       REGISTER — Register dengan konfirmasi password berbeda
+       ============================================================ #}
+    {% set precondition %}
+
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Register
+        Isi email baru lain@example.test
+        Isi password fiktif Baru!234
+        Isi konfirmasi password fiktif Berbeda!234
+        Isi field wajib lainnya
+        Klik tombol Register
+    {% endset %}
+
+    {% set expected %}
+        Pesan konfirmasi password tidak cocok ditampilkan
+        Akun tidak dibuat
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "register-password-mismatch",
+        "prefix": "REGISTER",
+        "feature": "Register",
+        "scenario": "Register dengan konfirmasi password berbeda",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P1",
+        "tags": [],
+        "test_data": none,
+        "test_type": "negative"
+    }) %}
+{% endblock register_password_mismatch %}
+
+{{ {"test_cases": ns.cases} | tojson }}

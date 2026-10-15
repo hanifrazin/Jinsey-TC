@@ -1,0 +1,326 @@
+{# ============================================================
+   PERSIAPAN
+   Ambil langkah/prasyarat bersama dan siapkan daftar test case.
+   ============================================================ #}
+{% import "shared/login_steps.j2" as login %}
+{% import "shared/preconditions.j2" as pre %}
+{% set ns = namespace(cases=[], login_examples=[]) %}
+
+
+{# ============================================================
+   LOGIN — SATU BLOCK PER TEST CASE
+   Setiap block berisi langkah khusus, hasil, dan data kasusnya.
+   Langkah awal dan prasyarat bersama ditambahkan lewat loop di bawah.
+   ============================================================ #}
+
+{% block login_success %}
+    {# TC: login-success — Login dengan kredensial valid #}
+    {% set success_action %}
+        Masukkan email pengguna@example.test
+        Masukkan password fiktif Valid!234
+        Klik tombol Login
+    {% endset %}
+
+    {% set success_expected %}
+        Pengguna berhasil masuk
+        Halaman utama ditampilkan
+    {% endset %}
+
+    {% set _ = ns.login_examples.append({
+        "key": "login-success",
+        "prefix": "LOGIN",
+        "title": "Login dengan kredensial valid",
+        "action": success_action,
+        "expected": success_expected,
+        "priority": "P0",
+        "type": "positive"
+    }) %}
+{% endblock login_success %}
+
+
+{% block login_wrong_password %}
+    {# TC: login-wrong-password — Login dengan password salah #}
+    {% set wrong_action %}
+        Masukkan email pengguna@example.test
+        Masukkan password fiktif Salah!234
+        Klik tombol Login
+    {% endset %}
+
+    {% set wrong_expected %}
+        Pesan kredensial tidak valid ditampilkan
+        Pengguna tetap berada di halaman Login
+    {% endset %}
+
+    {% set _ = ns.login_examples.append({
+        "key": "login-wrong-password",
+        "prefix": "LOGIN",
+        "title": "Login dengan password salah",
+        "action": wrong_action,
+        "expected": wrong_expected,
+        "priority": "P1",
+        "type": "negative"
+    }) %}
+{% endblock login_wrong_password %}
+
+
+{% block login_empty_email %}
+    {# TC: login-empty-email — Login tanpa email #}
+    {% set empty_email_action %}
+        Kosongkan email
+        Isi password fiktif Valid!234
+        Klik tombol Login
+    {% endset %}
+
+    {% set _ = ns.login_examples.append({
+        "key": "login-empty-email",
+        "prefix": "LOGIN",
+        "title": "Login tanpa email",
+        "action": empty_email_action,
+        "expected": "Pesan email wajib diisi ditampilkan",
+        "priority": "P1",
+        "type": "negative"
+    }) %}
+{% endblock login_empty_email %}
+
+
+{% block login_empty_fields %}
+    {# TC: login-empty-fields — Login tanpa mengisi formulir #}
+    {% set empty_action %}
+        Biarkan email dan password kosong
+        Klik tombol Login
+    {% endset %}
+
+    {% set empty_expected %}
+        Pesan email wajib diisi ditampilkan
+        Pesan password wajib diisi ditampilkan
+    {% endset %}
+
+    {% set _ = ns.login_examples.append({
+        "key": "login-empty-fields",
+        "prefix": "LOGIN",
+        "title": "Login tanpa mengisi formulir",
+        "action": empty_action,
+        "expected": empty_expected,
+        "priority": "P2",
+        "type": "negative"
+    }) %}
+{% endblock login_empty_fields %}
+
+
+{% block login_password_visibility %}
+    {# TC: login-password-visibility — Tampilkan dan sembunyikan password #}
+    {% set visibility_action %}
+        Masukkan password fiktif Valid!234
+        Klik ikon tampilkan password
+        Amati teks password
+        Klik ikon sembunyikan password
+    {% endset %}
+
+    {% set visibility_expected %}
+        Password terlihat setelah ikon tampilkan diklik
+        Password tersamarkan kembali setelah ikon sembunyikan diklik
+    {% endset %}
+
+    {% set _ = ns.login_examples.append({
+        "key": "login-password-visibility",
+        "prefix": "LOGIN",
+        "title": "Tampilkan dan sembunyikan password",
+        "action": visibility_action,
+        "expected": visibility_expected,
+        "priority": "P2",
+        "type": "functional"
+    }) %}
+{% endblock login_password_visibility %}
+
+
+{# ============================================================
+   LOGIN — PERAKITAN BERSAMA
+   Gabungkan lima kasus di atas dengan macro langkah/prasyarat.
+   Namespace menjaga data tetap tersedia di luar masing-masing block.
+   ============================================================ #}
+{% for example in ns.login_examples %}
+    {# Gabungkan langkah awal bersama dengan langkah khusus kasus ini. #}
+    {% set steps %}
+        {{ login.open_login() }}
+        {{ example.action }}
+    {% endset %}
+
+    {% set case = {
+        "key": example.key,
+        "feature": "Login",
+        "scenario": example.title,
+        "precondition": pre.active_account(),
+        "steps": steps,
+        "expected": example.expected,
+        "priority": example.priority,
+        "tags": ["fictional", example.type],
+        "test_type": example.type,
+        "test_data": {
+            "email": "pengguna@example.test"
+        }
+    } %}
+    {% if "prefix" in example %}
+        {% set _ = case.update({"prefix": example.prefix}) %}
+    {% endif %}
+    {% set _ = ns.cases.append(case) %}
+{% endfor %}
+
+
+{% block register_success %}
+    {# ============================================================
+       TC: register-success
+       REGISTER — Register akun baru
+       ============================================================ #}
+    {% set steps %}
+        Buka halaman Register
+        Isi nama tampilan Pengguna Fiktif
+        Isi email baru baru@example.test
+        Isi password fiktif Baru!234 dan konfirmasi yang sama
+        Setujui ketentuan aplikasi fiktif
+        Klik tombol Register
+    {% endset %}
+
+    {% set expected %}
+        Akun baru berhasil dibuat
+        Pesan pendaftaran berhasil ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "register-success",
+        "prefix": "REGISTER",
+        "feature": "Register",
+        "scenario": "Register akun baru",
+        "precondition": "Email baru@example.test belum terdaftar",
+        "steps": steps,
+        "expected": expected,
+        "priority": "P1",
+        "tags": ["fictional", "positive"],
+        "test_type": "positive",
+        "test_data": {
+            "email": "baru@example.test",
+            "name": "Pengguna Fiktif"
+        }
+    }) %}
+{% endblock register_success %}
+
+
+{% block register_invalid_email %}
+    {# ============================================================
+       TC: register-invalid-email
+       REGISTER — Register dengan format email salah
+       ============================================================ #}
+    {% set steps %}
+        Buka halaman Register
+        Isi email dengan teks bukan-email
+        Isi field wajib lainnya dengan data fiktif valid
+        Klik tombol Register
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "register-invalid-email",
+        "prefix": "REGISTER",
+        "feature": "Register",
+        "scenario": "Register dengan format email salah",
+        "steps": steps,
+        "expected": "Pesan format email tidak valid ditampilkan",
+        "test_type": "negative"
+    }) %}
+{% endblock register_invalid_email %}
+
+
+{% block register_password_mismatch %}
+    {# ============================================================
+       TC: register-password-mismatch
+       REGISTER — Register dengan konfirmasi password berbeda
+       ============================================================ #}
+    {% set steps %}
+        Buka halaman Register
+        Isi email baru lain@example.test
+        Isi password fiktif Baru!234
+        Isi konfirmasi password fiktif Berbeda!234
+        Isi field wajib lainnya
+        Klik tombol Register
+    {% endset %}
+
+    {% set expected %}
+        Pesan konfirmasi password tidak cocok ditampilkan
+        Akun tidak dibuat
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "register-password-mismatch",
+        "prefix": "REGISTER",
+        "feature": "Register",
+        "scenario": "Register dengan konfirmasi password berbeda",
+        "steps": steps,
+        "expected": expected,
+        "priority": "P1",
+        "test_type": "negative"
+    }) %}
+{% endblock register_password_mismatch %}
+
+
+{% block logout_success %}
+    {# ============================================================
+       TC: logout-success
+       LOGOUT — Logout dari sesi aktif
+       ============================================================ #}
+    {% set steps %}
+        Buka menu akun
+        Klik tombol Logout
+    {% endset %}
+
+    {% set expected %}
+        Sesi pengguna berakhir
+        Halaman Login ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "logout-success",
+        "prefix": "LOGOUT",
+        "feature": "Logout",
+        "scenario": "Logout dari sesi aktif",
+        "precondition": pre.signed_in(),
+        "steps": steps,
+        "expected": expected,
+        "priority": "P0",
+        "tags": ["smoke", "fictional"]
+    }) %}
+{% endblock logout_success %}
+
+
+{% block logout_protected_page %}
+    {# ============================================================
+       TC: logout-protected-page
+       LOGOUT — Akses halaman terlindungi setelah Logout
+       ============================================================ #}
+    {% set steps %}
+        Buka menu akun
+        Klik tombol Logout
+        Gunakan tombol kembali pada browser
+        Muat ulang halaman yang memerlukan sesi aktif
+    {% endset %}
+
+    {% set expected %}
+        Pengguna diarahkan ke halaman Login
+        Konten halaman terlindungi tidak ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "logout-protected-page",
+        "prefix": "LOGOUT",
+        "feature": "Logout",
+        "scenario": "Akses halaman terlindungi setelah Logout",
+        "precondition": pre.signed_in(),
+        "steps": steps,
+        "expected": expected,
+        "priority": "P1",
+        "test_type": "negative"
+    }) %}
+{% endblock logout_protected_page %}
+
+
+{# ============================================================
+   HASIL AKHIR — Serahkan seluruh kasus ke generator.
+   ============================================================ #}
+{{ {"test_cases": ns.cases} | tojson }}

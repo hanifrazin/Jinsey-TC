@@ -1,0 +1,48 @@
+{# Contoh mode folder: file ini menjadi sheet login_positive. #}
+{% set ns = namespace(cases=[]) %}
+
+{% block login_success %}
+    {# ============================================================
+       ID referensi (prefix LOGIN): LOGIN-001
+       Key: login-success
+       LOGIN — Login dengan kredensial valid
+       ============================================================ #}
+    {% set precondition %}
+        Akun fiktif pengguna@example.test sudah terdaftar dan aktif
+        Pengguna belum memiliki sesi aktif
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Login aplikasi fiktif Lentera
+        Pastikan formulir Login ditampilkan
+        Masukkan email pengguna@example.test
+        Masukkan password fiktif Valid!234
+        Klik tombol Login
+    {% endset %}
+
+    {% set expected %}
+        Pengguna berhasil masuk
+        Halaman utama ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "login-success",
+        "prefix": "LOGIN",
+        "feature": "Login",
+        "scenario": "Login dengan kredensial valid",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P0",
+        "tags": [
+            "fictional",
+            "positive"
+        ],
+        "test_data": {
+            "email": "pengguna@example.test"
+        },
+        "test_type": "positive"
+    }) %}
+{% endblock login_success %}
+
+{{ {"test_cases": ns.cases} | tojson }}

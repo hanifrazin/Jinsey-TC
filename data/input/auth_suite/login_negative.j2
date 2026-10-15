@@ -1,0 +1,179 @@
+{# Contoh mode folder: file ini menjadi sheet login_negative. #}
+{% set ns = namespace(cases=[]) %}
+
+{% block login_wrong_password %}
+    {# ============================================================
+       ID referensi (prefix LOGIN): LOGIN-002
+       Key: login-wrong-password
+       LOGIN — Login dengan password salah
+       ============================================================ #}
+    {% set precondition %}
+        Akun fiktif pengguna@example.test sudah terdaftar dan aktif
+        Pengguna belum memiliki sesi aktif
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Login aplikasi fiktif Lentera
+        Pastikan formulir Login ditampilkan
+        Masukkan email pengguna@example.test
+        Masukkan password fiktif Salah!234
+        Klik tombol Login
+    {% endset %}
+
+    {% set expected %}
+        Pesan kredensial tidak valid ditampilkan
+        Pengguna tetap berada di halaman Login
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "login-wrong-password",
+        "prefix": "LOGIN",
+        "feature": "Login",
+        "scenario": "Login dengan password salah",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P1",
+        "tags": [
+            "fictional",
+            "negative"
+        ],
+        "test_data": {
+            "email": "pengguna@example.test"
+        },
+        "test_type": "negative"
+    }) %}
+{% endblock login_wrong_password %}
+
+{% block login_empty_email %}
+    {# ============================================================
+       ID referensi (prefix LOGIN): LOGIN-003
+       Key: login-empty-email
+       LOGIN — Login tanpa email
+       ============================================================ #}
+    {% set precondition %}
+        Akun fiktif pengguna@example.test sudah terdaftar dan aktif
+        Pengguna belum memiliki sesi aktif
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Login aplikasi fiktif Lentera
+        Pastikan formulir Login ditampilkan
+        Kosongkan email
+        Isi password fiktif Valid!234
+        Klik tombol Login
+    {% endset %}
+
+    {% set expected %}
+        Pesan email wajib diisi ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "login-empty-email",
+        "prefix": "LOGIN",
+        "feature": "Login",
+        "scenario": "Login tanpa email",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P1",
+        "tags": [
+            "fictional",
+            "negative"
+        ],
+        "test_data": {
+            "email": "pengguna@example.test"
+        },
+        "test_type": "negative"
+    }) %}
+{% endblock login_empty_email %}
+
+{% block login_empty_fields %}
+    {# ============================================================
+       ID referensi (prefix LOGIN): LOGIN-004
+       Key: login-empty-fields
+       LOGIN — Login tanpa mengisi formulir
+       ============================================================ #}
+    {% set precondition %}
+        Akun fiktif pengguna@example.test sudah terdaftar dan aktif
+        Pengguna belum memiliki sesi aktif
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Login aplikasi fiktif Lentera
+        Pastikan formulir Login ditampilkan
+        Biarkan email dan password kosong
+        Klik tombol Login
+    {% endset %}
+
+    {% set expected %}
+        Pesan email wajib diisi ditampilkan
+        Pesan password wajib diisi ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "login-empty-fields",
+        "prefix": "LOGIN",
+        "feature": "Login",
+        "scenario": "Login tanpa mengisi formulir",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P2",
+        "tags": [
+            "fictional",
+            "negative"
+        ],
+        "test_data": {
+            "email": "pengguna@example.test"
+        },
+        "test_type": "negative"
+    }) %}
+{% endblock login_empty_fields %}
+
+{% block login_password_visibility %}
+    {# ============================================================
+       ID referensi (prefix LOGIN): LOGIN-005
+       Key: login-password-visibility
+       LOGIN — Tampilkan dan sembunyikan password
+       ============================================================ #}
+    {% set precondition %}
+        Akun fiktif pengguna@example.test sudah terdaftar dan aktif
+        Pengguna belum memiliki sesi aktif
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Login aplikasi fiktif Lentera
+        Pastikan formulir Login ditampilkan
+        Masukkan password fiktif Valid!234
+        Klik ikon tampilkan password
+        Amati teks password
+        Klik ikon sembunyikan password
+    {% endset %}
+
+    {% set expected %}
+        Password terlihat setelah ikon tampilkan diklik
+        Password tersamarkan kembali setelah ikon sembunyikan diklik
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "login-password-visibility",
+        "prefix": "LOGIN",
+        "feature": "Login",
+        "scenario": "Tampilkan dan sembunyikan password",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P2",
+        "tags": [
+            "fictional",
+            "functional"
+        ],
+        "test_data": {
+            "email": "pengguna@example.test"
+        },
+        "test_type": "functional"
+    }) %}
+{% endblock login_password_visibility %}
+
+{{ {"test_cases": ns.cases} | tojson }}

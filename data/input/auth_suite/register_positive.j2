@@ -1,0 +1,49 @@
+{# Contoh mode folder: file ini menjadi sheet register_positive. #}
+{% set ns = namespace(cases=[]) %}
+
+{% block register_success %}
+    {# ============================================================
+       ID referensi (prefix REGISTER): REGISTER-001
+       Key: register-success
+       REGISTER — Register akun baru
+       ============================================================ #}
+    {% set precondition %}
+        Email baru@example.test belum terdaftar
+    {% endset %}
+
+    {% set steps %}
+        Buka halaman Register
+        Isi nama tampilan Pengguna Fiktif
+        Isi email baru baru@example.test
+        Isi password fiktif Baru!234 dan konfirmasi yang sama
+        Setujui ketentuan aplikasi fiktif
+        Klik tombol Register
+    {% endset %}
+
+    {% set expected %}
+        Akun baru berhasil dibuat
+        Pesan pendaftaran berhasil ditampilkan
+    {% endset %}
+
+    {% set _ = ns.cases.append({
+        "key": "register-success",
+        "prefix": "REGISTER",
+        "feature": "Register",
+        "scenario": "Register akun baru",
+        "precondition": precondition,
+        "steps": steps,
+        "expected": expected,
+        "priority": "P1",
+        "tags": [
+            "fictional",
+            "positive"
+        ],
+        "test_data": {
+            "email": "baru@example.test",
+            "name": "Pengguna Fiktif"
+        },
+        "test_type": "positive"
+    }) %}
+{% endblock register_success %}
+
+{{ {"test_cases": ns.cases} | tojson }}
